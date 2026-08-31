@@ -181,7 +181,7 @@ public class BlockerEngine
 
         {
 
-            ActivePreferences = hasDrift ? inferred : config.Preferences.Clone(),
+            ActivePreferences = config.Preferences.Clone(),
 
             WindowsUpdateRunning = IsServiceRunning("wuauserv"),
 

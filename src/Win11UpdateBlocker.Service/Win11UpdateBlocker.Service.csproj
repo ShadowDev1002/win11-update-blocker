@@ -5,9 +5,9 @@
     <Nullable>enable</Nullable>
     <ImplicitUsings>enable</ImplicitUsings>
     <UserSecretsId>dotnet-Win11UpdateBlocker.Service-f1883ab4-f0f0-4d0f-af4b-7a94159ab09f</UserSecretsId>
-    <Version>1.0.1</Version>
-    <AssemblyVersion>1.0.1.0</AssemblyVersion>
-    <FileVersion>1.0.1.0</FileVersion>
+    <Version>1.0.2</Version>
+    <AssemblyVersion>1.0.2.0</AssemblyVersion>
+    <FileVersion>1.0.2.0</FileVersion>
     <Product>Win11 Update Blocker</Product>
     <AssemblyTitle>Win11 Update Blocker</AssemblyTitle>
     <Company>Win11 Update Blocker</Company>

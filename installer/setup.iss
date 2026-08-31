@@ -1,6 +1,6 @@
 #define MyAppName "Win11 Update Blocker"
 
-#define MyAppVersion "1.0.1"
+#define MyAppVersion "1.0.2"
 
 #define MyAppPublisher "Win11 Update Blocker"
 

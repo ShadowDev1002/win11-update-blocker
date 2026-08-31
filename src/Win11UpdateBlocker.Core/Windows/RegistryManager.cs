@@ -140,7 +140,7 @@ public static class RegistryManager
 
     internal static bool IsSecurityUpdatesBlocked() =>
         GetRegistryDword(AuKeyPath, "NoAutoUpdate") == 1
-        || GetRegistryDword(AuKeyPath, "DisableWindowsUpdateAccess") == 1;
+        || GetRegistryDword(AuKeyPath, "AUOptions") == 2;
 
     internal static bool IsQualityUpdatesBlocked() =>
         GetRegistryDword(WindowsUpdateKeyPath, "DeferQualityUpdates") == 1;
@@ -155,22 +155,14 @@ public static class RegistryManager
         GetRegistryDword(AuKeyPath, "NoAutoUpdate") == 1
         && GetRegistryDword(AuKeyPath, "DisableWindowsUpdateAccess") == 1;
 
-    internal static UpdatePreferences InferPreferencesFromRegistry()
+    internal static UpdatePreferences InferPreferencesFromRegistry() => new()
     {
-        if (IsFullyBlockedInRegistry())
-        {
-            return UpdatePreferences.CreateBlockAll();
-        }
-
-        return new UpdatePreferences
-        {
-            AllowFeatureUpdates = !IsFeatureUpdatesBlocked(),
-            AllowSecurityUpdates = !IsSecurityUpdatesBlocked(),
-            AllowQualityUpdates = !IsQualityUpdatesBlocked(),
-            AllowDriverUpdates = !IsDriverUpdatesBlocked(),
-            AllowOptionalUpdates = !IsOptionalUpdatesBlocked()
-        };
-    }
+        AllowFeatureUpdates = !IsFeatureUpdatesBlocked(),
+        AllowSecurityUpdates = !IsSecurityUpdatesBlocked(),
+        AllowQualityUpdates = !IsQualityUpdatesBlocked(),
+        AllowDriverUpdates = !IsDriverUpdatesBlocked(),
+        AllowOptionalUpdates = !IsOptionalUpdatesBlocked()
+    };
 
     private static int? GetRegistryDword(string keyPath, string valueName)
     {

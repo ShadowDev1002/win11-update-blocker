@@ -18,6 +18,8 @@ public sealed class MainViewModel : ViewModelBase, IDisposable
     private readonly DispatcherTimer _updateCheckTimer;
     private readonly Dispatcher _dispatcher;
     private int _refreshInProgress;
+    private bool _isLoadingPreferences;
+    private bool _preferencesDirty;
     private bool _isBusy;
     private bool _hasSystemAccess;
     private bool _hasDrift;
@@ -64,10 +66,18 @@ public sealed class MainViewModel : ViewModelBase, IDisposable
         {
             category.PropertyChanged += (_, args) =>
             {
-                if (args.PropertyName == nameof(UpdateCategoryViewModel.IsAllowed))
+                if (args.PropertyName != nameof(UpdateCategoryViewModel.IsAllowed))
                 {
-                    OnPropertyChanged(nameof(ShowSecurityWarning));
+                    return;
                 }
+
+                if (!_isLoadingPreferences)
+                {
+                    _preferencesDirty = true;
+                    HasDrift = false;
+                }
+
+                OnPropertyChanged(nameof(ShowSecurityWarning));
             };
         }
 
@@ -299,32 +309,54 @@ public sealed class MainViewModel : ViewModelBase, IDisposable
     private void ApplyStatusSnapshot(StatusSnapshot snapshot)
     {
         HasSystemAccess = snapshot.HasAccess;
-        LoadPreferences(snapshot.Status.ActivePreferences);
+
+        if (!_preferencesDirty)
+        {
+            LoadPreferences(snapshot.Status.ActivePreferences);
+        }
 
         WindowsUpdateStatus = snapshot.Status.WindowsUpdateRunning ? "Aktiv" : "Gestoppt";
         BackgroundServiceStatus = snapshot.ServiceRunning
             ? "Aktiv"
             : snapshot.ServiceInstalled ? "Installiert" : "Inaktiv";
         LastCheckText = snapshot.Status.LastCheck?.ToLocalTime().ToString("g") ?? "—";
-        HasDrift = snapshot.Status.HasDrift;
+        HasDrift = snapshot.Status.HasDrift && !_preferencesDirty;
         OnPropertyChanged(nameof(ShowSecurityWarning));
     }
 
     private void LoadPreferences(UpdatePreferences preferences)
     {
-        GetCategory("feature").IsAllowed = preferences.AllowFeatureUpdates;
-        GetCategory("security").IsAllowed = preferences.AllowSecurityUpdates;
-        GetCategory("quality").IsAllowed = preferences.AllowQualityUpdates;
-        GetCategory("driver").IsAllowed = preferences.AllowDriverUpdates;
-        GetCategory("optional").IsAllowed = preferences.AllowOptionalUpdates;
+        _isLoadingPreferences = true;
+        try
+        {
+            GetCategory("feature").IsAllowed = preferences.AllowFeatureUpdates;
+            GetCategory("security").IsAllowed = preferences.AllowSecurityUpdates;
+            GetCategory("quality").IsAllowed = preferences.AllowQualityUpdates;
+            GetCategory("driver").IsAllowed = preferences.AllowDriverUpdates;
+            GetCategory("optional").IsAllowed = preferences.AllowOptionalUpdates;
+        }
+        finally
+        {
+            _isLoadingPreferences = false;
+        }
     }
 
     private UpdateCategoryViewModel GetCategory(string key) =>
         Categories.First(c => c.Key == key);
 
-    private void SetAllowAll() => LoadPreferences(UpdatePreferences.CreateAllowAll());
+    private void SetAllowAll()
+    {
+        LoadPreferences(UpdatePreferences.CreateAllowAll());
+        _preferencesDirty = true;
+        HasDrift = false;
+    }
 
-    private void SetBlockAll() => LoadPreferences(UpdatePreferences.CreateBlockAll());
+    private void SetBlockAll()
+    {
+        LoadPreferences(UpdatePreferences.CreateBlockAll());
+        _preferencesDirty = true;
+        HasDrift = false;
+    }
 
     private async Task ApplyPreferencesAsync()
     {
@@ -352,6 +384,7 @@ public sealed class MainViewModel : ViewModelBase, IDisposable
         {
             SetBusy(true);
             await Task.Run(() => _engine.ApplyPreferences(preferences)).ConfigureAwait(false);
+            _preferencesDirty = false;
             ServiceAvailabilityCache.Invalidate();
             await RefreshStatusAsync().ConfigureAwait(false);
 
