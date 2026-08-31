@@ -66,6 +66,8 @@ RestartApplications=no
 
 AlwaysRestart=no
 
+RestartIfNeededByRun=no
+
 ChangesAssociations=no
 
 DisableWelcomePage=no
@@ -165,7 +167,77 @@ begin
 
   Exec('sc.exe', 'stop Win11UpdateBlockerService', '', SW_HIDE, ewWaitUntilTerminated, ResultCode);
 
+  Sleep(1500);
+
   Exec('taskkill.exe', '/IM Win11UpdateBlocker.exe /F', '', SW_HIDE, ewWaitUntilTerminated, ResultCode);
+
+  Exec('taskkill.exe', '/IM Win11UpdateBlocker.Service.exe /F', '', SW_HIDE, ewWaitUntilTerminated, ResultCode);
+
+  Sleep(500);
+
+end;
+
+
+
+procedure ClearStaleRebootMarkers;
+
+var
+
+  PendingOps: String;
+
+begin
+
+  if RegQueryStringValue(
+
+    HKEY_LOCAL_MACHINE,
+
+    'SYSTEM\CurrentControlSet\Control\Session Manager',
+
+    'PendingFileRenameOperations',
+
+    PendingOps) then
+
+  begin
+
+    if (Pos('Win11UpdateBlocker', PendingOps) > 0)
+
+       or (Pos('Win11 Update Blocker', PendingOps) > 0) then
+
+    begin
+
+      RegDeleteValue(
+
+        HKEY_LOCAL_MACHINE,
+
+        'SYSTEM\CurrentControlSet\Control\Session Manager',
+
+        'PendingFileRenameOperations');
+
+    end;
+
+  end;
+
+
+
+  if RegValueExists(
+
+    HKEY_LOCAL_MACHINE,
+
+    'Software\Microsoft\Windows\CurrentVersion\Uninstall\{A7B3C4D5-E6F7-4890-ABCD-EF1234567890}_is1',
+
+    'Inno Setup: Restart') then
+
+  begin
+
+    RegDeleteValue(
+
+      HKEY_LOCAL_MACHINE,
+
+      'Software\Microsoft\Windows\CurrentVersion\Uninstall\{A7B3C4D5-E6F7-4890-ABCD-EF1234567890}_is1',
+
+      'Inno Setup: Restart');
+
+  end;
 
 end;
 
@@ -337,6 +409,10 @@ function InitializeSetup(): Boolean;
 
 begin
 
+  StopRunningInstances;
+
+  ClearStaleRebootMarkers;
+
   Result := True;
 
 end;
@@ -352,6 +428,8 @@ begin
   NeedsRestart := False;
 
   StopRunningInstances;
+
+  ClearStaleRebootMarkers;
 
 end;
 
