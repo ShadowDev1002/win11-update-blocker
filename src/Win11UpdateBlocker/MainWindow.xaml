@@ -279,6 +279,30 @@
                     </StackPanel>
                 </Border>
 
+                <Border Style="{StaticResource CardBorder}" Margin="0,0,0,16">
+                    <StackPanel>
+                        <TextBlock Text="Software-Update" Style="{StaticResource SectionTitle}" />
+                        <TextBlock Text="{Binding CurrentVersionText}"
+                                   Style="{StaticResource SectionSubtitle}" />
+                        <TextBlock Text="{Binding UpdateStatusText}"
+                                   FontSize="12"
+                                   Foreground="{StaticResource TextSecondaryBrush}"
+                                   TextWrapping="Wrap"
+                                   Margin="0,0,0,12" />
+                        <StackPanel Orientation="Horizontal">
+                            <Button Content="Nach Updates suchen"
+                                    Style="{StaticResource SecondaryButton}"
+                                    Command="{Binding CheckForUpdateCommand}"
+                                    MinWidth="160"
+                                    Margin="0,0,10,0" />
+                            <Button Content="Jetzt aktualisieren"
+                                    Command="{Binding InstallUpdateCommand}"
+                                    MinWidth="160"
+                                    Visibility="{Binding UpdateAvailable, Converter={StaticResource BoolToVisibility}}" />
+                        </StackPanel>
+                    </StackPanel>
+                </Border>
+
                 <Button Content="Einstellungen speichern"
                         Command="{Binding Settings.SaveCommand}"
                         HorizontalAlignment="Stretch" />
@@ -378,22 +402,49 @@
                     </Button>
                 </StackPanel>
 
-                <Border Grid.Row="3"
-                        Background="{StaticResource CardItemBackgroundBrush}"
-                        BorderBrush="{StaticResource CardBorderBrush}"
-                        BorderThickness="1"
-                        CornerRadius="8"
-                        Padding="12,10"
-                        Margin="0,12,0,0">
-                    <StackPanel>
-                        <TextBlock Text="Systemzugriff"
-                                   FontSize="11"
-                                   Foreground="{StaticResource TextSecondaryBrush}" />
-                        <TextBlock Text="{Binding SystemAccessText}"
-                                   FontWeight="SemiBold"
-                                   Margin="0,4,0,0" />
-                    </StackPanel>
-                </Border>
+                <StackPanel Grid.Row="3">
+                    <Border Background="{StaticResource InfoBgBrush}"
+                            BorderBrush="{StaticResource InfoBorderBrush}"
+                            BorderThickness="1"
+                            CornerRadius="8"
+                            Padding="12,10"
+                            Margin="0,0,0,10"
+                            Visibility="{Binding UpdateAvailable, Converter={StaticResource BoolToVisibility}}">
+                        <StackPanel>
+                            <TextBlock Text="App-Update verfügbar"
+                                       FontSize="11"
+                                       FontWeight="SemiBold"
+                                       Foreground="{StaticResource InfoTextBrush}" />
+                            <TextBlock Text="{Binding UpdateBannerText}"
+                                       FontWeight="SemiBold"
+                                       Foreground="{StaticResource InfoTextBrush}"
+                                       Margin="0,4,0,8" />
+                            <Button Content="Jetzt aktualisieren"
+                                    Command="{Binding InstallUpdateCommand}"
+                                    HorizontalAlignment="Stretch" />
+                        </StackPanel>
+                    </Border>
+
+                    <TextBlock Text="{Binding CurrentVersionText}"
+                               FontSize="11"
+                               Foreground="{StaticResource TextSecondaryBrush}"
+                               Margin="0,0,0,8" />
+
+                    <Border Background="{StaticResource CardItemBackgroundBrush}"
+                            BorderBrush="{StaticResource CardBorderBrush}"
+                            BorderThickness="1"
+                            CornerRadius="8"
+                            Padding="12,10">
+                        <StackPanel>
+                            <TextBlock Text="Systemzugriff"
+                                       FontSize="11"
+                                       Foreground="{StaticResource TextSecondaryBrush}" />
+                            <TextBlock Text="{Binding SystemAccessText}"
+                                       FontWeight="SemiBold"
+                                       Margin="0,4,0,0" />
+                        </StackPanel>
+                    </Border>
+                </StackPanel>
             </Grid>
         </Border>
 

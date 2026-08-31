@@ -6,6 +6,7 @@ using Win11UpdateBlocker.Core;
 using Win11UpdateBlocker.Core.Ipc;
 using Win11UpdateBlocker.Core.Logging;
 using Win11UpdateBlocker.Core.Models;
+using Win11UpdateBlocker.Core.Updates;
 
 namespace Win11UpdateBlocker.ViewModels;
 
@@ -22,6 +23,11 @@ public sealed class MainViewModel : ViewModelBase, IDisposable
     private string _windowsUpdateStatus = "—";
     private string _backgroundServiceStatus = "—";
     private string _lastCheckText = "—";
+    private bool _updateAvailable;
+    private bool _isUpdateBusy;
+    private string _updateBannerText = string.Empty;
+    private string _updateStatusText = "Noch nicht geprüft";
+    private AppUpdateInfo? _pendingUpdate;
 
     public MainViewModel()
     {
@@ -44,6 +50,8 @@ public sealed class MainViewModel : ViewModelBase, IDisposable
         NavigateUpdatesCommand = new RelayCommand(() => SelectedSection = NavigationSection.Updates);
         NavigateStatusCommand = new RelayCommand(() => SelectedSection = NavigationSection.Status);
         NavigateSettingsCommand = new RelayCommand(() => SelectedSection = NavigationSection.Settings);
+        CheckForUpdateCommand = new RelayCommand(() => _ = CheckForAppUpdateAsync(showUpToDateMessage: true), () => !IsUpdateBusy);
+        InstallUpdateCommand = new RelayCommand(() => _ = InstallUpdateAsync(), () => UpdateAvailable && !IsUpdateBusy);
 
         Settings = new SettingsViewModel();
         Settings.SettingsSaved += () => _ = RefreshStatusAsync();
@@ -64,7 +72,10 @@ public sealed class MainViewModel : ViewModelBase, IDisposable
         _refreshTimer.Start();
 
         _ = RefreshStatusAsync();
+        _ = CheckForAppUpdateAsync();
     }
+
+    public string CurrentVersionText => $"Version {AppMetadata.Version}";
 
     public ObservableCollection<UpdateCategoryViewModel> Categories { get; }
 
@@ -116,6 +127,43 @@ public sealed class MainViewModel : ViewModelBase, IDisposable
     public bool NeedsSystemAccessHelp => !HasSystemAccess;
 
     public string SystemAccessText => HasSystemAccess ? "Bereit" : "Dienst offline";
+
+    public bool UpdateAvailable
+    {
+        get => _updateAvailable;
+        private set
+        {
+            if (SetProperty(ref _updateAvailable, value))
+            {
+                InstallUpdateCommand.RaiseCanExecuteChanged();
+            }
+        }
+    }
+
+    public bool IsUpdateBusy
+    {
+        get => _isUpdateBusy;
+        private set
+        {
+            if (SetProperty(ref _isUpdateBusy, value))
+            {
+                CheckForUpdateCommand.RaiseCanExecuteChanged();
+                InstallUpdateCommand.RaiseCanExecuteChanged();
+            }
+        }
+    }
+
+    public string UpdateBannerText
+    {
+        get => _updateBannerText;
+        private set => SetProperty(ref _updateBannerText, value);
+    }
+
+    public string UpdateStatusText
+    {
+        get => _updateStatusText;
+        private set => SetProperty(ref _updateStatusText, value);
+    }
 
     public SettingsViewModel Settings { get; }
 
@@ -175,6 +223,10 @@ public sealed class MainViewModel : ViewModelBase, IDisposable
     public RelayCommand AllowAllCommand { get; }
 
     public RelayCommand BlockAllCommand { get; }
+
+    public RelayCommand CheckForUpdateCommand { get; }
+
+    public RelayCommand InstallUpdateCommand { get; }
 
     public void RefreshStatus() => _ = RefreshStatusAsync();
 
@@ -309,6 +361,130 @@ public sealed class MainViewModel : ViewModelBase, IDisposable
         finally
         {
             await _dispatcher.InvokeAsync(() => SetBusy(false));
+        }
+    }
+
+    private async Task CheckForAppUpdateAsync(bool showUpToDateMessage = false)
+    {
+        if (IsUpdateBusy)
+        {
+            return;
+        }
+
+        try
+        {
+            IsUpdateBusy = true;
+            UpdateStatusText = "Suche nach Updates…";
+
+            var update = await GitHubReleaseUpdateChecker.CheckForUpdateAsync().ConfigureAwait(false);
+
+            await _dispatcher.InvokeAsync(() =>
+            {
+                _pendingUpdate = update;
+
+                if (update is null)
+                {
+                    UpdateAvailable = false;
+                    UpdateBannerText = string.Empty;
+                    UpdateStatusText = $"Version {AppMetadata.Version} ist aktuell.";
+
+                    if (showUpToDateMessage)
+                    {
+                        MessageBox.Show(
+                            $"Du verwendest bereits die neueste Version ({AppMetadata.Version}).",
+                            AppMetadata.DisplayName,
+                            MessageBoxButton.OK,
+                            MessageBoxImage.Information);
+                    }
+
+                    return;
+                }
+
+                UpdateAvailable = true;
+                UpdateBannerText = $"Version {update.LatestVersion} verfügbar";
+                UpdateStatusText = $"Update {update.LatestVersion} auf GitHub verfügbar.";
+            });
+        }
+        catch (Exception ex)
+        {
+            FileLogger.Log($"UpdateChecker: check failed — {ex.Message}");
+
+            await _dispatcher.InvokeAsync(() =>
+            {
+                UpdateStatusText = "Update-Prüfung fehlgeschlagen.";
+
+                if (showUpToDateMessage)
+                {
+                    MessageBox.Show(
+                        $"Update-Prüfung fehlgeschlagen:\n{ex.Message}",
+                        AppMetadata.DisplayName,
+                        MessageBoxButton.OK,
+                        MessageBoxImage.Warning);
+                }
+            });
+        }
+        finally
+        {
+            await _dispatcher.InvokeAsync(() => IsUpdateBusy = false);
+        }
+    }
+
+    private async Task InstallUpdateAsync()
+    {
+        if (_pendingUpdate is null)
+        {
+            await CheckForAppUpdateAsync();
+        }
+
+        var update = _pendingUpdate;
+        if (update is null)
+        {
+            return;
+        }
+
+        var confirm = MessageBox.Show(
+            $"Version {update.LatestVersion} wird heruntergeladen und installiert.\n\n" +
+            "Die App schließt sich danach. Der Installer startet mit Administratorrechten.",
+            AppMetadata.DisplayName,
+            MessageBoxButton.OKCancel,
+            MessageBoxImage.Information);
+
+        if (confirm != MessageBoxResult.OK)
+        {
+            return;
+        }
+
+        try
+        {
+            IsUpdateBusy = true;
+            UpdateStatusText = "Update wird heruntergeladen…";
+
+            var installerPath = await GitHubReleaseUpdateChecker.DownloadInstallerAsync(update).ConfigureAwait(false);
+
+            await _dispatcher.InvokeAsync(() =>
+            {
+                UpdateStatusText = "Installer wird gestartet…";
+                GitHubReleaseUpdateChecker.LaunchInstaller(installerPath);
+                Application.Current.Shutdown();
+            });
+        }
+        catch (Exception ex)
+        {
+            FileLogger.Log($"UpdateChecker: install failed — {ex.Message}");
+
+            await _dispatcher.InvokeAsync(() =>
+            {
+                UpdateStatusText = "Update fehlgeschlagen.";
+                MessageBox.Show(
+                    $"Update konnte nicht installiert werden:\n{ex.Message}",
+                    AppMetadata.DisplayName,
+                    MessageBoxButton.OK,
+                    MessageBoxImage.Error);
+            });
+        }
+        finally
+        {
+            await _dispatcher.InvokeAsync(() => IsUpdateBusy = false);
         }
     }
 
