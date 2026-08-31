@@ -95,6 +95,16 @@ Name: "launchapp"; Description: "Win11 Update Blocker nach der Installation star
 [Dirs]
 Name: "{commonappdata}\Win11UpdateBlocker"; Permissions: users-modify
 
+[InstallDelete]
+
+Type: filesandordirs; Name: "{app}\service"; Check: IsExistingInstall
+
+Type: files; Name: "{app}\{#MyAppExeName}"; Check: IsExistingInstall
+
+Type: filesandordirs; Name: "{app}\Assets"; Check: IsExistingInstall
+
+
+
 [Files]
 
 Source: "..\publish\gui\*"; DestDir: "{app}"; Flags: ignoreversion recursesubdirs createallsubdirs
@@ -173,35 +183,49 @@ begin
 
   Exec('taskkill.exe', '/IM Win11UpdateBlocker.Service.exe /F', '', SW_HIDE, ewWaitUntilTerminated, ResultCode);
 
-  Sleep(500);
+  Sleep(3000);
 
 end;
 
 
 
-procedure ClearStaleRebootMarkers;
-
-var
-
-  PendingOps: String;
+function IsExistingInstall(): Boolean;
 
 begin
 
-  if RegQueryStringValue(
+  Result := RegKeyExists(
+
+    HKEY_LOCAL_MACHINE,
+
+    'Software\Microsoft\Windows\CurrentVersion\Uninstall\{A7B3C4D5-E6F7-4890-ABCD-EF1234567890}_is1');
+
+end;
+
+
+
+procedure DeletePendingRenamesForApp(const ValueName: String);
+
+var
+
+  BinaryData: AnsiString;
+
+begin
+
+  if RegQueryBinaryValue(
 
     HKEY_LOCAL_MACHINE,
 
     'SYSTEM\CurrentControlSet\Control\Session Manager',
 
-    'PendingFileRenameOperations',
+    ValueName,
 
-    PendingOps) then
+    BinaryData) then
 
   begin
 
-    if (Pos('Win11UpdateBlocker', PendingOps) > 0)
+    if (Pos('Win11UpdateBlocker', BinaryData) > 0)
 
-       or (Pos('Win11 Update Blocker', PendingOps) > 0) then
+       or (Pos('Win11 Update Blocker', BinaryData) > 0) then
 
     begin
 
@@ -211,11 +235,45 @@ begin
 
         'SYSTEM\CurrentControlSet\Control\Session Manager',
 
-        'PendingFileRenameOperations');
+        ValueName);
 
     end;
 
   end;
+
+end;
+
+
+
+procedure ClearStaleRebootMarkers;
+
+var
+
+  ResultCode: Integer;
+
+begin
+
+  DeletePendingRenamesForApp('PendingFileRenameOperations');
+
+  DeletePendingRenamesForApp('PendingFileRenameOperations2');
+
+
+
+  Exec('powershell.exe',
+
+    '-NoProfile -ExecutionPolicy Bypass -Command "' +
+
+    '$key = ''HKLM:\SYSTEM\CurrentControlSet\Control\Session Manager''; ' +
+
+    'foreach ($name in @(''PendingFileRenameOperations'',''PendingFileRenameOperations2'')) { ' +
+
+    '  $value = (Get-ItemProperty -Path $key -Name $name -ErrorAction SilentlyContinue).$name; ' +
+
+    '  if ($null -ne $value -and ($value -match ''Win11 Update Blocker|Win11UpdateBlocker'')) { ' +
+
+    '    Remove-ItemProperty -Path $key -Name $name -Force -ErrorAction SilentlyContinue } }"',
+
+    '', SW_HIDE, ewWaitUntilTerminated, ResultCode);
 
 
 
