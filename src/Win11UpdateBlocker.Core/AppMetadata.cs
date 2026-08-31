@@ -12,6 +12,8 @@ public static class AppMetadata
 
     public const string ReleaseAssetFileName = "Win11-Update-Blocker-Setup.exe";
 
+    public static readonly TimeSpan UpdateCheckInterval = TimeSpan.FromHours(6);
+
     public const string ServiceInternalName = "Win11UpdateBlockerService";
 
     public const string ConfigFolderName = "Win11UpdateBlocker";

@@ -16,6 +16,7 @@ public partial class MainWindow : Window
         DataContext = _viewModel;
         InitializeComponent();
         _trayManager = new TrayIconManager(this, _viewModel);
+        _viewModel.AttachTrayIconManager(_trayManager);
     }
 
     protected override void OnClosing(CancelEventArgs e)

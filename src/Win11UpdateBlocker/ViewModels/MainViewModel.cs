@@ -7,6 +7,7 @@ using Win11UpdateBlocker.Core.Ipc;
 using Win11UpdateBlocker.Core.Logging;
 using Win11UpdateBlocker.Core.Models;
 using Win11UpdateBlocker.Core.Updates;
+using Win11UpdateBlocker.Tray;
 
 namespace Win11UpdateBlocker.ViewModels;
 
@@ -14,6 +15,7 @@ public sealed class MainViewModel : ViewModelBase, IDisposable
 {
     private readonly BlockerEngine _engine = new();
     private readonly DispatcherTimer _refreshTimer;
+    private readonly DispatcherTimer _updateCheckTimer;
     private readonly Dispatcher _dispatcher;
     private int _refreshInProgress;
     private bool _isBusy;
@@ -28,6 +30,8 @@ public sealed class MainViewModel : ViewModelBase, IDisposable
     private string _updateBannerText = string.Empty;
     private string _updateStatusText = "Noch nicht geprüft";
     private AppUpdateInfo? _pendingUpdate;
+    private string? _notifiedUpdateVersion;
+    private TrayIconManager? _trayIconManager;
 
     public MainViewModel()
     {
@@ -71,8 +75,17 @@ public sealed class MainViewModel : ViewModelBase, IDisposable
         _refreshTimer.Tick += (_, _) => _ = RefreshStatusAsync();
         _refreshTimer.Start();
 
+        _updateCheckTimer = new DispatcherTimer { Interval = AppMetadata.UpdateCheckInterval };
+        _updateCheckTimer.Tick += (_, _) => _ = CheckForAppUpdateAsync(trayNotify: true);
+
         _ = RefreshStatusAsync();
-        _ = CheckForAppUpdateAsync();
+    }
+
+    public void AttachTrayIconManager(TrayIconManager trayIconManager)
+    {
+        _trayIconManager = trayIconManager;
+        _updateCheckTimer.Start();
+        _ = CheckForAppUpdateAsync(notifyUser: true, trayNotify: true);
     }
 
     public string CurrentVersionText => $"Version {AppMetadata.Version}";
@@ -364,7 +377,7 @@ public sealed class MainViewModel : ViewModelBase, IDisposable
         }
     }
 
-    private async Task CheckForAppUpdateAsync(bool showUpToDateMessage = false)
+    private async Task CheckForAppUpdateAsync(bool showUpToDateMessage = false, bool notifyUser = false, bool trayNotify = false)
     {
         if (IsUpdateBusy)
         {
@@ -403,6 +416,7 @@ public sealed class MainViewModel : ViewModelBase, IDisposable
                 UpdateAvailable = true;
                 UpdateBannerText = $"Version {update.LatestVersion} verfügbar";
                 UpdateStatusText = $"Update {update.LatestVersion} auf GitHub verfügbar.";
+                NotifyAboutUpdate(update, notifyUser, trayNotify);
             });
         }
         catch (Exception ex)
@@ -426,6 +440,31 @@ public sealed class MainViewModel : ViewModelBase, IDisposable
         finally
         {
             await _dispatcher.InvokeAsync(() => IsUpdateBusy = false);
+        }
+    }
+
+    private void NotifyAboutUpdate(AppUpdateInfo update, bool notifyUser, bool trayNotify)
+    {
+        if (_notifiedUpdateVersion == update.LatestVersion)
+        {
+            return;
+        }
+
+        _notifiedUpdateVersion = update.LatestVersion;
+
+        if (notifyUser)
+        {
+            MessageBox.Show(
+                $"Version {update.LatestVersion} ist verfügbar.\n\n" +
+                "Du kannst das Update in der Sidebar oder unter Einstellungen → Software-Update installieren.",
+                AppMetadata.DisplayName,
+                MessageBoxButton.OK,
+                MessageBoxImage.Information);
+        }
+
+        if (trayNotify)
+        {
+            _trayIconManager?.ShowUpdateNotification(update.LatestVersion);
         }
     }
 
@@ -530,7 +569,11 @@ public sealed class MainViewModel : ViewModelBase, IDisposable
         }
     }
 
-    public void Dispose() => _refreshTimer.Stop();
+    public void Dispose()
+    {
+        _refreshTimer.Stop();
+        _updateCheckTimer.Stop();
+    }
 
     private sealed record StatusSnapshot(
         BlockerStatus Status,

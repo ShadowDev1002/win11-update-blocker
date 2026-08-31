@@ -68,6 +68,20 @@ public sealed class TrayIconManager : IDisposable
         }
     }
 
+    public void ShowUpdateNotification(string latestVersion)
+    {
+        if (_notifyIcon is null || !_notifyIcon.Visible)
+        {
+            return;
+        }
+
+        _notifyIcon.ShowBalloonTip(
+            12000,
+            AppMetadata.DisplayName,
+            $"Version {latestVersion} ist verfügbar. Doppelklick zum Öffnen.",
+            ToolTipIcon.Info);
+    }
+
     private void InitializeTrayIcon()
     {
         var contextMenu = new ContextMenuStrip();

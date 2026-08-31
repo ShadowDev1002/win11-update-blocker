@@ -282,7 +282,7 @@
                 <Border Style="{StaticResource CardBorder}" Margin="0,0,0,16">
                     <StackPanel>
                         <TextBlock Text="Software-Update" Style="{StaticResource SectionTitle}" />
-                        <TextBlock Text="{Binding CurrentVersionText}"
+                        <TextBlock Text="Prüft beim Start und alle 6 Stunden automatisch auf GitHub-Releases."
                                    Style="{StaticResource SectionSubtitle}" />
                         <TextBlock Text="{Binding UpdateStatusText}"
                                    FontSize="12"
