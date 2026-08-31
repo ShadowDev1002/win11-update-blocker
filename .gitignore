@@ -1,0 +1,23 @@
+# Build output
+bin/
+obj/
+publish/
+.vs/
+
+# Installer artifacts
+installer/output/
+tools/
+
+# Local / internal
+docs/
+.superpowers/
+
+# Secrets
+.env
+.env.*
+*.pfx
+*.key
+
+# OS
+Thumbs.db
+Desktop.ini
