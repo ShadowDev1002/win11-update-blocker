@@ -4,7 +4,7 @@ public static class AppMetadata
 {
     public const string DisplayName = "Win11 Update Blocker";
 
-    public const string Version = "1.0.3";
+    public const string Version = "1.0.4";
 
     public const string GitHubOwner = "ShadowDev1002";
 

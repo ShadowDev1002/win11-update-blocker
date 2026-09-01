@@ -7,6 +7,7 @@ using Win11UpdateBlocker.Core.Ipc;
 using Win11UpdateBlocker.Core.Logging;
 using Win11UpdateBlocker.Core.Models;
 using Win11UpdateBlocker.Core.Updates;
+using Win11UpdateBlocker.Dialogs;
 using Win11UpdateBlocker.Tray;
 
 namespace Win11UpdateBlocker.ViewModels;
@@ -436,11 +437,10 @@ public sealed class MainViewModel : ViewModelBase, IDisposable
 
                     if (showUpToDateMessage)
                     {
-                        MessageBox.Show(
-                            $"Du verwendest bereits die neueste Version ({AppMetadata.Version}).",
-                            AppMetadata.DisplayName,
-                            MessageBoxButton.OK,
-                            MessageBoxImage.Information);
+                        AppDialogWindow.Show(
+                            GetOwnerWindow(),
+                            "Software-Update",
+                            $"Du verwendest bereits die neueste Version ({AppMetadata.Version}).");
                     }
 
                     return;
@@ -462,11 +462,10 @@ public sealed class MainViewModel : ViewModelBase, IDisposable
 
                 if (showUpToDateMessage)
                 {
-                    MessageBox.Show(
-                        $"Update-Prüfung fehlgeschlagen:\n{ex.Message}",
-                        AppMetadata.DisplayName,
-                        MessageBoxButton.OK,
-                        MessageBoxImage.Warning);
+                    AppDialogWindow.Show(
+                        GetOwnerWindow(),
+                        "Software-Update",
+                        $"Update-Prüfung fehlgeschlagen:\n{ex.Message}");
                 }
             });
         }
@@ -487,12 +486,12 @@ public sealed class MainViewModel : ViewModelBase, IDisposable
 
         if (notifyUser)
         {
-            MessageBox.Show(
-                $"Version {update.LatestVersion} ist verfügbar.\n\n" +
-                "Du kannst das Update in der Sidebar oder unter Einstellungen → Software-Update installieren.",
-                AppMetadata.DisplayName,
-                MessageBoxButton.OK,
-                MessageBoxImage.Information);
+            var result = AppDialogWindow.ShowUpdateAvailable(GetOwnerWindow(), update.LatestVersion);
+            if (result == MessageBoxResult.OK)
+            {
+                _ = InstallUpdateAsync(skipConfirmation: true);
+                return;
+            }
         }
 
         if (trayNotify)
@@ -501,7 +500,7 @@ public sealed class MainViewModel : ViewModelBase, IDisposable
         }
     }
 
-    private async Task InstallUpdateAsync()
+    private async Task InstallUpdateAsync(bool skipConfirmation = false)
     {
         if (_pendingUpdate is null)
         {
@@ -514,16 +513,21 @@ public sealed class MainViewModel : ViewModelBase, IDisposable
             return;
         }
 
-        var confirm = MessageBox.Show(
-            $"Version {update.LatestVersion} wird heruntergeladen und installiert.\n\n" +
-            "Die App schließt sich danach. Der Installer startet mit Administratorrechten.",
-            AppMetadata.DisplayName,
-            MessageBoxButton.OKCancel,
-            MessageBoxImage.Information);
-
-        if (confirm != MessageBoxResult.OK)
+        if (!skipConfirmation)
         {
-            return;
+            var confirm = AppDialogWindow.Show(
+                GetOwnerWindow(),
+                "Update installieren",
+                $"Version {update.LatestVersion} wird heruntergeladen und installiert.\n\n" +
+                "Die App schließt sich danach. Der Installer startet mit Administratorrechten.",
+                MessageBoxButton.OKCancel,
+                primaryText: "Installieren",
+                secondaryText: "Abbrechen");
+
+            if (confirm != MessageBoxResult.OK)
+            {
+                return;
+            }
         }
 
         try
@@ -547,11 +551,10 @@ public sealed class MainViewModel : ViewModelBase, IDisposable
             await _dispatcher.InvokeAsync(() =>
             {
                 UpdateStatusText = "Update fehlgeschlagen.";
-                MessageBox.Show(
-                    $"Update konnte nicht installiert werden:\n{ex.Message}",
-                    AppMetadata.DisplayName,
-                    MessageBoxButton.OK,
-                    MessageBoxImage.Error);
+                AppDialogWindow.Show(
+                    GetOwnerWindow(),
+                    "Update fehlgeschlagen",
+                    $"Update konnte nicht installiert werden:\n{ex.Message}");
             });
         }
         finally
@@ -559,6 +562,10 @@ public sealed class MainViewModel : ViewModelBase, IDisposable
             await _dispatcher.InvokeAsync(() => IsUpdateBusy = false);
         }
     }
+
+    private static Window? GetOwnerWindow() =>
+        Application.Current.Windows.OfType<Window>().FirstOrDefault(w => w.IsActive)
+        ?? Application.Current.MainWindow;
 
     private void SetBusy(bool isBusy)
     {

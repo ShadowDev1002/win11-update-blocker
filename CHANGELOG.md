@@ -2,6 +2,13 @@
 
 Alle wesentlichen Änderungen an diesem Projekt werden in dieser Datei dokumentiert.
 
+## [1.0.4] - 2026-09-01
+
+### Geändert
+
+- Update-Hinweis als dunkler, themenpassender Dialog statt Windows-MessageBox
+- Update-Dialog mit „Jetzt aktualisieren“ / „Später“
+
 ## [1.0.3] - 2026-09-01
 
 ### Geändert
