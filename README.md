@@ -2,11 +2,13 @@
 
 Windows-11-Desktop-App zum gezielten Steuern von Windows Update: Feature-, Sicherheits-, Qualitäts-, Treiber- und optionale Updates lassen sich einzeln erlauben oder blockieren. Ein optionaler Hintergrund-Dienst hält die Einstellungen dauerhaft aktiv.
 
+![Win11 Update Blocker – Updates steuern](assets/screenshot.png)
+
 ## Download
 
 **Installer (empfohlen):** [Neuestes Release](https://github.com/ShadowDev1002/win11-update-blocker/releases/latest)
 
-1. `Win11 Update Blocker Setup.exe` herunterladen
+1. `Win11-Update-Blocker-Setup.exe` herunterladen
 2. Als Administrator ausführen
 3. App starten, gewünschte Update-Typen wählen
 4. **Einstellungen anwenden** klicken
