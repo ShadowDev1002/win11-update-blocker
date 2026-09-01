@@ -43,7 +43,7 @@
                                     <Border Background="{StaticResource CardItemBackgroundBrush}"
                                             BorderBrush="{StaticResource CardBorderBrush}"
                                             BorderThickness="1"
-                                            CornerRadius="10"
+                                            CornerRadius="4"
                                             Padding="14,12"
                                             Margin="0,0,0,10">
                                                 <Grid>
@@ -76,7 +76,7 @@
                 <Border Background="{StaticResource WarningBgBrush}"
                         BorderBrush="{StaticResource WarningBorderBrush}"
                         BorderThickness="1"
-                        CornerRadius="10"
+                        CornerRadius="4"
                         Padding="14"
                         Margin="0,0,0,16"
                         Visibility="{Binding ShowSecurityWarning, Converter={StaticResource BoolToVisibility}}">
@@ -89,7 +89,7 @@
                 <Border Background="{StaticResource InfoBgBrush}"
                         BorderBrush="{StaticResource InfoBorderBrush}"
                         BorderThickness="1"
-                        CornerRadius="10"
+                        CornerRadius="4"
                         Padding="14"
                         Margin="0,0,0,16"
                         Visibility="{Binding HasDrift, Converter={StaticResource BoolToVisibility}}">
@@ -164,7 +164,7 @@
                 <Border Background="{StaticResource DangerBgBrush}"
                         BorderBrush="{StaticResource DangerBorderBrush}"
                         BorderThickness="1"
-                        CornerRadius="10"
+                        CornerRadius="4"
                         Padding="14"
                         Visibility="{Binding NeedsSystemAccessHelp, Converter={StaticResource BoolToVisibility}}">
                     <StackPanel>
@@ -187,7 +187,7 @@
                         <Border Background="{StaticResource CardItemBackgroundBrush}"
                                 BorderBrush="{StaticResource CardBorderBrush}"
                                 BorderThickness="1"
-                                CornerRadius="10"
+                                CornerRadius="4"
                                 Padding="14,12"
                                 Margin="0,0,0,10">
                             <Grid>
@@ -217,7 +217,7 @@
                         <Border Background="{StaticResource CardItemBackgroundBrush}"
                                 BorderBrush="{StaticResource CardBorderBrush}"
                                 BorderThickness="1"
-                                CornerRadius="10"
+                                CornerRadius="4"
                                 Padding="14,12"
                                 Margin="0,0,0,10">
                             <Grid>
@@ -243,7 +243,7 @@
                         <Border Background="{StaticResource CardItemBackgroundBrush}"
                                 BorderBrush="{StaticResource CardBorderBrush}"
                                 BorderThickness="1"
-                                CornerRadius="10"
+                                CornerRadius="4"
                                 Padding="14,12">
                             <Grid>
                                 <Grid.ColumnDefinitions>
@@ -268,7 +268,7 @@
                         <Border Background="{StaticResource DangerBgBrush}"
                                 BorderBrush="{StaticResource DangerBorderBrush}"
                                 BorderThickness="1"
-                                CornerRadius="10"
+                                CornerRadius="4"
                                 Padding="12"
                                 Margin="0,14,0,0"
                                 Visibility="{Binding NeedsSystemAccessHelp, Converter={StaticResource BoolToVisibility}}">
@@ -406,7 +406,7 @@
                     <Border Background="{StaticResource InfoBgBrush}"
                             BorderBrush="{StaticResource InfoBorderBrush}"
                             BorderThickness="1"
-                            CornerRadius="8"
+                            CornerRadius="4"
                             Padding="12,10"
                             Margin="0,0,0,10"
                             Visibility="{Binding UpdateAvailable, Converter={StaticResource BoolToVisibility}}">
@@ -433,7 +433,7 @@
                     <Border Background="{StaticResource CardItemBackgroundBrush}"
                             BorderBrush="{StaticResource CardBorderBrush}"
                             BorderThickness="1"
-                            CornerRadius="8"
+                            CornerRadius="4"
                             Padding="12,10">
                         <StackPanel>
                             <TextBlock Text="Systemzugriff"

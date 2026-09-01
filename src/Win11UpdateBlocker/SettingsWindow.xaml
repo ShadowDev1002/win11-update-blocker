@@ -29,10 +29,10 @@
                 Style="{StaticResource CardBorder}"
                 Padding="16">
             <StackPanel>
-                <Border Background="#F8FAFC"
+                <Border Background="{StaticResource CardItemBackgroundBrush}"
                         BorderBrush="{StaticResource CardBorderBrush}"
                         BorderThickness="1"
-                        CornerRadius="10"
+                        CornerRadius="4"
                         Padding="14,12"
                         Margin="0,0,0,10">
                     <Grid>
@@ -54,17 +54,16 @@
                                        Margin="0,6,0,0" />
                         </StackPanel>
                         <CheckBox Grid.Column="1"
-                                  Style="{StaticResource ModernCheckBox}"
                                   Content="Aktiv"
                                   IsChecked="{Binding BackgroundServiceEnabled, Mode=TwoWay}"
                                   VerticalAlignment="Center" />
                     </Grid>
                 </Border>
 
-                <Border Background="#F8FAFC"
+                <Border Background="{StaticResource CardItemBackgroundBrush}"
                         BorderBrush="{StaticResource CardBorderBrush}"
                         BorderThickness="1"
-                        CornerRadius="10"
+                        CornerRadius="4"
                         Padding="14,12"
                         Margin="0,0,0,10">
                     <Grid>
@@ -82,17 +81,16 @@
                                        Margin="0,4,0,0" />
                         </StackPanel>
                         <CheckBox Grid.Column="1"
-                                  Style="{StaticResource ModernCheckBox}"
                                   Content="Aktiv"
                                   IsChecked="{Binding AutostartEnabled, Mode=TwoWay}"
                                   VerticalAlignment="Center" />
                     </Grid>
                 </Border>
 
-                <Border Background="#F8FAFC"
+                <Border Background="{StaticResource CardItemBackgroundBrush}"
                         BorderBrush="{StaticResource CardBorderBrush}"
                         BorderThickness="1"
-                        CornerRadius="10"
+                        CornerRadius="4"
                         Padding="14,12">
                     <Grid>
                         <Grid.ColumnDefinitions>
@@ -109,22 +107,21 @@
                                        Margin="0,4,0,0" />
                         </StackPanel>
                         <CheckBox Grid.Column="1"
-                                  Style="{StaticResource ModernCheckBox}"
                                   Content="Aktiv"
                                   IsChecked="{Binding TrayEnabled, Mode=TwoWay}"
                                   VerticalAlignment="Center" />
                     </Grid>
                 </Border>
 
-                <Border Background="#FEF2F2"
-                        BorderBrush="#FECACA"
+                <Border Background="{StaticResource DangerBgBrush}"
+                        BorderBrush="{StaticResource DangerBorderBrush}"
                         BorderThickness="1"
-                        CornerRadius="10"
+                        CornerRadius="4"
                         Padding="12"
                         Margin="0,14,0,0"
                         Visibility="{Binding RequiresAdminForService, Converter={StaticResource BoolToVisibility}}">
                     <TextBlock Text="Für den Hintergrund-Dienst musst du die App als Administrator starten."
-                               Foreground="#991B1B"
+                               Foreground="{StaticResource DangerTextBrush}"
                                TextWrapping="Wrap" />
                 </Border>
             </StackPanel>

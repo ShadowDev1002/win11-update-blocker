@@ -4,29 +4,33 @@
     <Application.Resources>
         <BooleanToVisibilityConverter x:Key="BoolToVisibility" />
 
-        <!-- Dark palette -->
-        <SolidColorBrush x:Key="AppBackgroundBrush" Color="#0B1220" />
-        <SolidColorBrush x:Key="SidebarBackgroundBrush" Color="#111827" />
-        <SolidColorBrush x:Key="SidebarBorderBrush" Color="#1F2937" />
-        <SolidColorBrush x:Key="CardBackgroundBrush" Color="#162032" />
-        <SolidColorBrush x:Key="CardItemBackgroundBrush" Color="#1A2740" />
-        <SolidColorBrush x:Key="CardBorderBrush" Color="#243044" />
-        <SolidColorBrush x:Key="TextPrimaryBrush" Color="#F1F5F9" />
-        <SolidColorBrush x:Key="TextSecondaryBrush" Color="#94A3B8" />
-        <SolidColorBrush x:Key="AccentBrush" Color="#0078D4" />
-        <SolidColorBrush x:Key="AccentHoverBrush" Color="#1A8FE8" />
-        <SolidColorBrush x:Key="NavHoverBrush" Color="#1E293B" />
-        <SolidColorBrush x:Key="NavActiveBrush" Color="#1E3A5F" />
-        <SolidColorBrush x:Key="NavActiveBorderBrush" Color="#0078D4" />
-        <SolidColorBrush x:Key="WarningBgBrush" Color="#422006" />
-        <SolidColorBrush x:Key="WarningBorderBrush" Color="#B45309" />
-        <SolidColorBrush x:Key="WarningTextBrush" Color="#FCD34D" />
-        <SolidColorBrush x:Key="InfoBgBrush" Color="#172554" />
-        <SolidColorBrush x:Key="InfoBorderBrush" Color="#3B82F6" />
-        <SolidColorBrush x:Key="InfoTextBrush" Color="#93C5FD" />
-        <SolidColorBrush x:Key="DangerBgBrush" Color="#450A0A" />
-        <SolidColorBrush x:Key="DangerBorderBrush" Color="#B91C1C" />
-        <SolidColorBrush x:Key="DangerTextBrush" Color="#FCA5A5" />
+        <!-- Windows 11 Settings–inspired dark palette -->
+        <SolidColorBrush x:Key="AppBackgroundBrush" Color="#202020" />
+        <SolidColorBrush x:Key="SidebarBackgroundBrush" Color="#1C1C1C" />
+        <SolidColorBrush x:Key="SidebarBorderBrush" Color="#2E2E2E" />
+        <SolidColorBrush x:Key="CardBackgroundBrush" Color="#2C2C2C" />
+        <SolidColorBrush x:Key="CardItemBackgroundBrush" Color="#2C2C2C" />
+        <SolidColorBrush x:Key="CardBorderBrush" Color="#3F3F3F" />
+        <SolidColorBrush x:Key="TextPrimaryBrush" Color="#FFFFFF" />
+        <SolidColorBrush x:Key="TextSecondaryBrush" Color="#9A9A9A" />
+        <SolidColorBrush x:Key="AccentBrush" Color="#60CDFF" />
+        <SolidColorBrush x:Key="AccentHoverBrush" Color="#7AD7FF" />
+        <SolidColorBrush x:Key="AccentForegroundBrush" Color="#000000" />
+        <SolidColorBrush x:Key="NavHoverBrush" Color="#2A2A2A" />
+        <SolidColorBrush x:Key="NavActiveBrush" Color="#2A2A2A" />
+        <SolidColorBrush x:Key="NavActiveBorderBrush" Color="#60CDFF" />
+        <SolidColorBrush x:Key="WarningBgBrush" Color="#33260F" />
+        <SolidColorBrush x:Key="WarningBorderBrush" Color="#C47A12" />
+        <SolidColorBrush x:Key="WarningTextBrush" Color="#F5D78E" />
+        <SolidColorBrush x:Key="InfoBgBrush" Color="#2A2A2A" />
+        <SolidColorBrush x:Key="InfoBorderBrush" Color="#60CDFF" />
+        <SolidColorBrush x:Key="InfoTextBrush" Color="#CFCFCF" />
+        <SolidColorBrush x:Key="DangerBgBrush" Color="#3A1515" />
+        <SolidColorBrush x:Key="DangerBorderBrush" Color="#C42B1C" />
+        <SolidColorBrush x:Key="DangerTextBrush" Color="#F4A8A0" />
+        <SolidColorBrush x:Key="ToggleOffBrush" Color="#666666" />
+        <SolidColorBrush x:Key="DisabledBackgroundBrush" Color="#3A3A3A" />
+        <SolidColorBrush x:Key="DisabledForegroundBrush" Color="#7A7A7A" />
 
         <Style TargetType="Window">
             <Setter Property="FontFamily" Value="Segoe UI Variable Text, Segoe UI" />
@@ -48,7 +52,7 @@
             <Setter Property="Background" Value="{StaticResource CardBackgroundBrush}" />
             <Setter Property="BorderBrush" Value="{StaticResource CardBorderBrush}" />
             <Setter Property="BorderThickness" Value="1" />
-            <Setter Property="CornerRadius" Value="12" />
+            <Setter Property="CornerRadius" Value="6" />
             <Setter Property="Padding" Value="20" />
         </Style>
 
@@ -67,9 +71,9 @@
 
         <Style TargetType="Button">
             <Setter Property="Padding" Value="18,10" />
-            <Setter Property="MinHeight" Value="40" />
+            <Setter Property="MinHeight" Value="36" />
             <Setter Property="Background" Value="{StaticResource AccentBrush}" />
-            <Setter Property="Foreground" Value="White" />
+            <Setter Property="Foreground" Value="{StaticResource AccentForegroundBrush}" />
             <Setter Property="BorderThickness" Value="0" />
             <Setter Property="Cursor" Value="Hand" />
             <Setter Property="FontWeight" Value="SemiBold" />
@@ -77,7 +81,7 @@
                 <Setter.Value>
                     <ControlTemplate TargetType="Button">
                         <Border Background="{TemplateBinding Background}"
-                                CornerRadius="8"
+                                CornerRadius="4"
                                 Padding="{TemplateBinding Padding}">
                             <ContentPresenter HorizontalAlignment="Center"
                                               VerticalAlignment="Center" />
@@ -87,8 +91,8 @@
                                 <Setter Property="Background" Value="{StaticResource AccentHoverBrush}" />
                             </Trigger>
                             <Trigger Property="IsEnabled" Value="False">
-                                <Setter Property="Background" Value="#334155" />
-                                <Setter Property="Foreground" Value="#64748B" />
+                                <Setter Property="Background" Value="{StaticResource DisabledBackgroundBrush}" />
+                                <Setter Property="Foreground" Value="{StaticResource DisabledForegroundBrush}" />
                             </Trigger>
                         </ControlTemplate.Triggers>
                     </ControlTemplate>
@@ -98,7 +102,7 @@
 
         <Style x:Key="SecondaryButton" TargetType="Button">
             <Setter Property="Padding" Value="16,10" />
-            <Setter Property="MinHeight" Value="40" />
+            <Setter Property="MinHeight" Value="36" />
             <Setter Property="Background" Value="{StaticResource CardItemBackgroundBrush}" />
             <Setter Property="Foreground" Value="{StaticResource TextPrimaryBrush}" />
             <Setter Property="BorderBrush" Value="{StaticResource CardBorderBrush}" />
@@ -111,7 +115,7 @@
                         <Border Background="{TemplateBinding Background}"
                                 BorderBrush="{TemplateBinding BorderBrush}"
                                 BorderThickness="{TemplateBinding BorderThickness}"
-                                CornerRadius="8"
+                                CornerRadius="4"
                                 Padding="{TemplateBinding Padding}">
                             <ContentPresenter HorizontalAlignment="Center"
                                               VerticalAlignment="Center" />
@@ -121,7 +125,7 @@
                                 <Setter Property="Background" Value="{StaticResource NavHoverBrush}" />
                             </Trigger>
                             <Trigger Property="IsEnabled" Value="False">
-                                <Setter Property="Foreground" Value="#64748B" />
+                                <Setter Property="Foreground" Value="{StaticResource DisabledForegroundBrush}" />
                             </Trigger>
                         </ControlTemplate.Triggers>
                     </ControlTemplate>
@@ -131,7 +135,7 @@
 
         <Style x:Key="PresetChipButton" TargetType="Button" BasedOn="{StaticResource SecondaryButton}">
             <Setter Property="Padding" Value="14,8" />
-            <Setter Property="MinHeight" Value="36" />
+            <Setter Property="MinHeight" Value="32" />
             <Setter Property="FontWeight" Value="Normal" />
         </Style>
 
@@ -151,7 +155,7 @@
                                 Background="{TemplateBinding Background}"
                                 BorderBrush="Transparent"
                                 BorderThickness="3,0,0,0"
-                                CornerRadius="8"
+                                CornerRadius="4"
                                 Padding="{TemplateBinding Padding}">
                             <ContentPresenter HorizontalAlignment="{TemplateBinding HorizontalContentAlignment}"
                                               VerticalAlignment="Center" />
@@ -168,8 +172,8 @@
         </Style>
 
         <Style x:Key="ToggleSwitch" TargetType="ToggleButton">
-            <Setter Property="Width" Value="46" />
-            <Setter Property="Height" Value="26" />
+            <Setter Property="Width" Value="44" />
+            <Setter Property="Height" Value="24" />
             <Setter Property="Background" Value="Transparent" />
             <Setter Property="BorderThickness" Value="0" />
             <Setter Property="Cursor" Value="Hand" />
@@ -177,14 +181,14 @@
             <Setter Property="Template">
                 <Setter.Value>
                     <ControlTemplate TargetType="ToggleButton">
-                        <Grid Width="46" Height="26">
+                        <Grid Width="44" Height="24">
                             <Border x:Name="Track"
-                                    CornerRadius="13"
-                                    Background="#475569" />
+                                    CornerRadius="12"
+                                    Background="{StaticResource ToggleOffBrush}" />
                             <Ellipse x:Name="Thumb"
-                                     Width="20"
-                                     Height="20"
-                                     Fill="#F8FAFC"
+                                     Width="18"
+                                     Height="18"
+                                     Fill="#FFFFFF"
                                      HorizontalAlignment="Left"
                                      Margin="3,0,0,0" />
                         </Grid>
